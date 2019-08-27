@@ -1,4 +1,4 @@
-package com.eomcs.lms.conf;
+package com.shp.board.conf;
 
 import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;

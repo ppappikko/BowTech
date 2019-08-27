@@ -1,4 +1,4 @@
-package com.eomcs.lms.conf;
+package com.shp.board.conf;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,7 +13,7 @@ import org.springframework.web.util.UrlPathHelper;
 // DispatcherServlet의 IoC 컨테이너가 준비해야 할 객체에 대한 정보.
 // => app-servlet.xml의 설정을 이 클래스가 대체한다.
 // 
-@ComponentScan("com.eomcs.lms.web")
+@ComponentScan("com.shp.board.web")
 @EnableWebMvc
 public class DefaultWebConfig implements WebMvcConfigurer {
   
@@ -52,21 +52,23 @@ public class DefaultWebConfig implements WebMvcConfigurer {
   }
   */
   
-  @Bean
-  public ViewResolver viewResolver() {
-    // 이 메서드는 DispatcherServlet의 다음 XML 설정과 같다.
-    /*
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-      <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-      <property name="prefix" value="/WEB-INF/jsp/"/>
-      <property name="suffix" value=".jsp"/>
-    </bean>
-     */
-    InternalResourceViewResolver vr = new InternalResourceViewResolver(
-        "/WEB-INF/jsp/", ".jsp");
-    vr.setViewClass(JstlView.class);
-    return vr;
-  }
+//  @Bean
+//  public ViewResolver viewResolver() {
+//    // 이 메서드는 DispatcherServlet의 다음 XML 설정과 같다.
+//    /*
+//    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+//      <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+//      <property name="prefix" value="/WEB-INF/jsp/"/>
+//      <property name="suffix" value=".jsp"/>
+//    </bean>
+//     */
+//    InternalResourceViewResolver vr = new InternalResourceViewResolver(
+//        "/WEB-INF/jsp/", ".jsp");
+//    vr.setViewClass(JstlView.class);
+//    return vr;
+//  }
+  
+  
 }
 
 

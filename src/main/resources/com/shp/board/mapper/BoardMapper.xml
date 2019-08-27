@@ -4,13 +4,20 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="com.eomcs.lms.dao.BoardDao">
+<mapper namespace="com.shp.board.dao.BoardDao">
   
   <resultMap type="board" id="boardMap">
     <id column="board_id" property="no"/>
+    <result column="titl" property="title"/>
     <result column="conts" property="contents"/>
     <result column="cdt" property="createdDate"/>
+    <result column="udt" property="updateDate"/>
     <result column="vw_cnt" property="viewCount"/>
+    <result column="usr" property="user"/>
+    <result column="pwd" property="password"/>
+    <result column="cmt_cnt" property="commentCount"/>
+    <result column="atch_file_cnt" property="atachedFileCount"/>
+    <result column="is_del" property="isDelete"/>
   </resultMap>
   
   <sql id="select1">
@@ -20,9 +27,10 @@
       cdt, 
       vw_cnt 
     from 
-      lms_board
+      bow_board
   </sql>
   
+  <!-- 리스트 -->
   <select id="findAll" resultMap="boardMap" parameterType="map">
     <include refid="select1"/>
     order by 
@@ -32,38 +40,54 @@
     </if>
   </select>
   
+  <!-- 상세 -->
   <select id="findByNo" resultMap="boardMap" parameterType="int">
     <include refid="select1"/>
     where 
       board_id = #{value}
   </select>
   
+  <!-- 조회수 증가 -->
   <update id="increaseCount" parameterType="int">
-    update lms_board 
+    update bow_board 
     set 
       vw_cnt = vw_cnt + 1 
     where board_id = #{value}
   </update>
   
+  <!-- 생성 -->
   <insert id="insert" parameterType="board">
-    insert into lms_board(conts) 
-    values(#{contents})
+    insert into bow_board(
+    titl,
+    conts,
+    usr,
+    pwd
+    ) 
+    values(
+    #{title},
+    #{contents},
+    #{user},
+    password(#{password})
+    )
   </insert>
   
+  <!-- 수정 -->
   <update id="update" parameterType="board">
-    update lms_board 
+    update bow_board 
     set 
       conts = #{contents} 
     where board_id = #{no}
   </update>
   
+  <!-- 삭제 -->
   <delete id="delete" parameterType="int">
-    delete from lms_board 
+    delete from bow_board 
     where board_id = #{no}
   </delete>
   
+  <!-- 전체글 개수 -->
   <select id="countAll" resultType="int">
-    select count(*) from lms_board
+    select count(*) from bow_board
   </select>
 </mapper>
 

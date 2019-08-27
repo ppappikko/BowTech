@@ -10,12 +10,6 @@
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd">
   
-  <!-- AOP 관련 애노테이션을 처리하라면 그 작업을 수행할 객체를 등록해야 한다.
-       스프링 IoC 컨테이너는 그 클래스가 무엇인지 몰라도 쉽게 등록할 수 있도록 
-       특별한 태그를 제공한다. 위의 <context:component-scan> 처럼!  -->
-  <!--  
-  <aop:aspectj-autoproxy/>
-  -->
   
   <!-- 스프링에서 제공하는 트랜잭션 처리 advice를 준비한다. 
        즉 개발자가 트랜잭션을 준비하고, commit()/rollback() 하는 advice를 만들 필요가 없다.
@@ -45,7 +39,7 @@
     <aop:config>
         <!-- 트랜잭션 advice를 적용할 대상을 정의한다. -->
         <aop:pointcut id="serviceOperation" 
-                      expression="execution(* com.eomcs.lms.service.impl.*.*(..))"/>
+                      expression="execution(* com.shp.board.service.impl.*.*(..))"/>
         
         <!-- 그 대상에 트랜잭션 advice를 지정한다. -->
         <aop:advisor advice-ref="txAdvice" 

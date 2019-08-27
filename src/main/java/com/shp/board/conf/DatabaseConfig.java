@@ -1,4 +1,4 @@
-package com.eomcs.lms.conf;
+package com.shp.board.conf;
 
 import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -17,16 +17,15 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //=> application-context-db.xml을 이 Java config 클래스가 대체한다.
 
 @Configuration // IoC 컨테이너에 이 클래스를 알려주지 않아도 찾을 수 있게 한다.
-@PropertySource("classpath:/com/eomcs/lms/conf/jdbc.properties")
+@PropertySource("classpath:/com/shp/board/conf/jdbc.properties")
 @EnableTransactionManagement
 public class DatabaseConfig {
   
   final static Logger logger = LogManager.getLogger(DatabaseConfig.class);
 
-  @Autowired 
+  @Autowired
   Environment env;
   
-
   public DatabaseConfig() {
     logger.debug("DatabaseConfig 객체 생성...");
   }
