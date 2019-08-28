@@ -1,11 +1,11 @@
-package com.eomcs.lms.service.impl;
+package com.shp.board.service.impl;
 
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import com.eomcs.lms.dao.BoardDao;
-import com.eomcs.lms.domain.Board;
-import com.eomcs.lms.service.BoardService;
+import com.shp.board.dao.BoardDao;
+import com.shp.board.domain.Board;
+import com.shp.board.service.BoardService;
 
 // 스프링 IoC 컨테이너가 관리하는 객체 중에서 
 // 비즈니스 로직을 담당하는 객체는 
@@ -20,7 +20,6 @@ public class BoardServiceImpl implements BoardService {
     this.boardDao = boardDao;
   }
   
-  // 비지니스 객체에서 메서드 이름은 가능한 업무 용어를 사용한다.
   @Override
   public List<Board> list(int pageNo, int pageSize) {
     // 게시물 목록을 가져오는 경우 서비스 객체에서 특별하게 할 일이 없다.
@@ -32,7 +31,12 @@ public class BoardServiceImpl implements BoardService {
     params.put("size", pageSize);
     params.put("rowNo", (pageNo - 1) * pageSize);
     
-    return boardDao.findAll(params);
+    return boardDao.findAllWithPage(params);
+  }
+  
+  @Override
+  public List<Board> list() {
+    return boardDao.findAll();
   }
   
   @Override

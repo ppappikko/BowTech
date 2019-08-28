@@ -31,13 +31,36 @@
   </sql>
   
   <!-- 리스트 -->
-  <select id="findAll" resultMap="boardMap" parameterType="map">
-    <include refid="select1"/>
+  <select id="findAllWithPage" resultMap="boardMap" parameterType="map">
+    select
+      board_id,
+      titl,
+      cdt,
+      vw_cnt,
+      usr,
+      is_del
+    from 
+      bow_board
     order by 
       board_id desc
     <if test="size != null and rowNo != null">
       limit #{rowNo}, #{size}
     </if>
+  </select>
+  
+  <!-- 리스트 -->
+  <select id="findAll" resultMap="boardMap">
+    select
+      board_id,
+      titl,
+      cdt,
+      vw_cnt,
+      usr,
+      is_del
+    from 
+      bow_board
+    order by 
+      board_id desc
   </select>
   
   <!-- 상세 -->

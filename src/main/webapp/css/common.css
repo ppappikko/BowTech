@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+body {
+  font-size: 12px;
+}
+
+body > header {
+  min-height: 60px;
+}
+    
+.container > h2 {
+  height: 40px;
+  margin-bottom: 50px;
+  /* border: 1px solid red; */
+  /* text-align: center; */
+}
+
+div.bit-list {
+  min-height: 200px;
+}
+
+div.container {
+  width: 800px;
+}
+
+.bow-invisible {
+  display: none;
+}
+
+.form-group > label {
+  text-align: right;
+}
+
+
+
+

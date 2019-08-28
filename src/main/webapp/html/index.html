@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>보우테크-게시판</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="/bowtech/css/common.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <header></header>
+  <div class="container">
+    <h2>보우테크 - 게시판</h2>
+    <p><a href='./form.html' class="btn btn-primary btn-sm">새 글</a></p>
+    
+    <div class="bow-list">
+    <table class="table table-hover">
+    <thead>
+      <tr> 
+        <th scope="col">번호</th>
+        <th scope="col">제목</th>
+        <th scope="col">작성자</th>
+        <th scope="col">등록일</th>
+        <th scope="col">조회수</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    </table>
+    </div>
+    
+    <nav aria-label="목록 페이지 이동">
+      <ul class="pagination justify-content-center">
+        <li id="prevPage"  class="page-item disabled">
+          <a class="page-link" href="?pageNo=0&pageSize=3"
+           tabindex="-1" aria-disabled="true">이전</a>
+        </li>
+        <li class="page-item active" aria-current="page">
+          <a class="page-link" href="#">1<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li id="nextPage"  class="page-item">
+          <a class="page-link" href="?pageNo=2&pageSize=3">다음</a>
+        </li>
+      </ul>
+    </nav>
+
+</div><!-- .container -->
+
+<!-- Handlebars 에서 사용할 HTML 템플릿 데이터를 준비한다. -->
+<script id="tr-template" type="text/x-handlebars-template">
+{{#each list}}
+<tr>
+  <th scope='row'>{{no}}</th>
+  <td><a class='bow-view-link' href='#' data-no='{{no}}'>{{title}}</a></td>
+  <td>{{user}}</td>
+  <td>{{createdDate}}</td>
+  <td>{{viewCount}}</td>
+</tr>
+{{/each}}
+</script>
+
+<!-- 페이지 넘버 -->
+<script id="page-template" type="text/x-handlebars-template">
+{{#each pages}}
+<li class="page-item"><a class="page-link" href="?pageNo={{no}}&pageSize=3">{{no}}</a></li>
+{{/each}}
+</script>
+  
+  
+  <script src="/bowtech/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/bowtech/node_modules/popper.js/dist/popper.min.js"></script>
+  <script src="/bowtech/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  
+  <script src="/bowtech/node_modules/handlebars/dist/handlebars.js"></script>
+  
+  <script src="index.js"></script>
+</body>
+</html>
