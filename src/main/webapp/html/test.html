@@ -15,7 +15,7 @@
     <h2>게시판</h2>
     <p><a href='./form.html' class="btn btn-primary btn-sm">새 글</a></p>
     
-    <div class="bow-list" style="min-height:467px">
+    <div class="bow-list" style="min-height:500px">
     <table class="table table-striped table-hover mb-0">
     <thead>
       <tr> 
@@ -28,18 +28,22 @@
     </thead>
     <tbody></tbody>
     </table>
-    </div>
     <hr class="mt-0">
+    </div>
     
     <nav aria-label="목록 페이지 이동">
       <ul class="pagination justify-content-center">
         <li id="prevPage" class="page-item">
           <a class="page-link" 
-            href="?pageNo=0&pageSize=3">이전</a></li>
-        <li id="currPage" class="page-item active"><span class="page-link">1</span></li>
-        <li id="nextPage" class="page-item ">
+            href="#">이전</a></li>
+        <li class="page-item page-num-item"><a class="page-link" href="#"></a></li>
+        <li class="page-item page-num-item"><a class="page-link" href="#"></a></li>
+        <li class="page-item page-num-item active"><span class="page-link">1</span></li>
+        <li class="page-item page-num-item"><a class="page-link" href="#"></a></li>
+        <li class="page-item page-num-item"><a class="page-link" href="#"></a></li>
+        <li id="nextPage" class="page-item">
           <a class="page-link" 
-             href="?pageNo=2&pageSize=3">다음</a></li>
+             href="#">다음</a></li>
       </ul>
     </nav>
     
@@ -56,7 +60,7 @@
 <script id="tr-template" type="text/x-handlebars-template">
 {{#each list}}
 <tr>
-  <th scope='row'>{{rowNo}}</th>
+  <th scope='row'>{{no}}</th>
   <td><a class='bow-view-link' href='#' data-no='{{no}}'>{{title}}</a></td>
   <td>{{user}}</td>
   <td>{{createdDate}}</td>

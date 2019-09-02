@@ -21,33 +21,28 @@ public class BoardServiceImpl implements BoardService {
   }
   
   @Override
-  public List<Board> list(int pageNo, int pageSize) {
-    // 게시물 목록을 가져오는 경우 서비스 객체에서 특별하게 할 일이 없다.
-    // 그럼에도 불구하고 Command 객체와 DAO 사이에 Service 객체를 두기로 했으면 
-    // 일관성을 위해 Command 객체는 항상 Service 객체를 통해 데이터를 다뤄야 한다.
-    // 
+  public List<Board> list(int pageNo, int pageSize, String keyword) throws Exception {
     
     HashMap<String,Object> params = new HashMap<>();
     params.put("size", pageSize);
     params.put("rowNo", (pageNo - 1) * pageSize);
     
-    return boardDao.findAllWithPage(params);
+    if (keyword != "" && keyword != null) {
+      params.put("keyword", keyword);
+    }
+    
+    return boardDao.findAll(params);
   }
   
   @Override
-  public List<Board> list() {
-    return boardDao.findAll();
-  }
-  
-  @Override
-  public int add(Board board) {
+  public int add(Board board) throws Exception {
     // 이 메서드도 하는 일이 없다.
     // 그래도 일관된 프로그래밍을 위해 Command 객체는 항상 Service 객체를 경유하여 DAO를 사용해야 한다.
     return boardDao.insert(board);
   }
   
   @Override
-  public Board get(int no) {
+  public Board get(int no) throws Exception {
     // 이제 조금 서비스 객체가 뭔가를 하는 구만.
     // Command 객체는 데이터를 조회한 후 조회수를 높이는 것에 대해 신경 쓸 필요가 없어졌다.
     Board board = boardDao.findByNo(no);
@@ -58,23 +53,32 @@ public class BoardServiceImpl implements BoardService {
   }
   
   @Override
-  public int update(Board board) {
+  public int update(Board board) throws Exception {
     // 이 메서드도 별로 할 일이 없다.
     // 그냥 DAO를 실행시키고 리턴 값을 그대로 전달한다.
     return boardDao.update(board);
   }
   
   @Override
-  public int delete(int no) {
+  public int delete(int no) throws Exception {
     // 이 메서드도 그냥 DAO에 명령을 전달하는 일을 한다.
     // 그래도 항상 Command 객체는 이 Service 객체를 통해서 데이터를 처리해야 한다.
     return boardDao.delete(no);
   }
   
   @Override
-  public int size() {
+  public int size(String keyword) throws Exception {
     // 전체 게시물의 개수
-    return boardDao.countAll();
+    return boardDao.countAll(keyword);
+  }
+
+  @Override
+  public boolean passwordCheck(int no, String password) throws Exception {
+    HashMap<String,Object> paramMap = new HashMap<>();
+    paramMap.put("no", no);
+    paramMap.put("password", password);
+    
+    return boardDao.findPassword(paramMap) > 0 ? true : false;
   }
 }
 

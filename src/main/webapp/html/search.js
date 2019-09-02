@@ -1,6 +1,8 @@
 var pageNo = 1,
     pageSize = 10,
-    keyword = '',
+    param = location.href.split('?')[1],
+    keyword = param.split('=')[1],
+    bowList = $('.bow-list'),
     tbody = $('tbody'),
     prevPageLi = $('#prevPage'),
     nextPageLi = $('#nextPage'),
@@ -12,12 +14,22 @@ var trGenerator = Handlebars.compile(templateSrc);
 
 
 // JSON 형식의 데이터 목록 가져오기
-function loadList(pn) {
+function loadList(pn, keyword) {
   
-  $.getJSON('../../bowtech/app/board/list?pageNo=' + pn + '&pageSize=' + pageSize, 
+  $.getJSON('../../bowtech/app/board/list?pageNo=' + pn +
+      '&pageSize=' + pageSize + '&keyword=' + keyword, 
     function(obj) {
       
-      console.log(obj);
+      if (obj.status == 'fail') {
+        if (bowList.children('div')) {
+          bowList.children('div').remove();
+        }
+        bowList.append('<div class="text-center"><span style="font-size:18px">검색 결과가 없습니다!!</span></tr>');
+        prevPageLi.addClass('disabled');
+        nextPageLi.addClass('disabled');
+        return false;
+      }
+      
       pageNo = obj.pageNo;
     
       // TR 태그를 생성하여 테이블 데이터를 갱신한다.
@@ -64,16 +76,16 @@ function loadList(pn) {
 // 이전, 다음 버튼 클릭 이벤트
 $('#prevPage > a').click((e) => {
   e.preventDefault();
-  loadList(pageNo - 1);
+  loadList(pageNo - 1, keyword);
 });
 
 $('#nextPage > a').click((e) => {
   e.preventDefault();
-  loadList(pageNo + 1);
+  loadList(pageNo + 1, keyword);
 });
 
-// 검색 버튼 클릭이벤트
-$('#search-btn').click(() => {
+//검색 버튼 클릭이벤트
+$('#search-btn').click(function() {
   searchResult($(this).siblings('input[type="text"]'));
 });
 
@@ -95,7 +107,7 @@ function searchResult(obj) {
 }
 
 // 페이지를 출력한 후 1페이지 목록을 로딩한다.
-loadList(pageNo);
+loadList(pageNo, keyword);
 
 // 테이블 목록 가져오기를 완료했으면 제목 a 태그에 클릭 리스너를 등록한다. 
 $(document.body).bind('loaded-list', () => {

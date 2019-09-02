@@ -7,6 +7,7 @@ public class Board implements Cloneable, Serializable {
   private static final long serialVersionUID = 1L;
 
   private int no;
+  private int rowNo; // 조건에 부합하는 전체 row 개수에서 번호를 매긴다
   private String title;
   private String contents;
   
@@ -26,14 +27,13 @@ public class Board implements Cloneable, Serializable {
   public Board clone() throws CloneNotSupportedException {
     return (Board) super.clone();
   }
-
   
   @Override
   public String toString() {
-    return "Board [no=" + no + ", title=" + title + ", contents=" + contents + ", createdDate="
-        + createdDate + ", updateDate=" + updateDate + ", viewCount=" + viewCount + ", user=" + user
-        + ", password=" + password + ", commentCount=" + commentCount + ", atachedFileCount="
-        + atachedFileCount + ", isDelete=" + isDelete + "]";
+    return "Board [no=" + no + ", rowNo=" + rowNo + ", title=" + title + ", contents=" + contents
+        + ", createdDate=" + createdDate + ", updateDate=" + updateDate + ", viewCount=" + viewCount
+        + ", user=" + user + ", password=" + password + ", commentCount=" + commentCount
+        + ", atachedFileCount=" + atachedFileCount + ", isDelete=" + isDelete + "]";
   }
 
   public int getNo() {
@@ -42,6 +42,14 @@ public class Board implements Cloneable, Serializable {
 
   public void setNo(int no) {
     this.no = no;
+  }
+  
+  public int getRowNo() {
+    return rowNo;
+  }
+
+  public void setRowNo(int rowNo) {
+    this.rowNo = rowNo;
   }
 
   public String getTitle() {

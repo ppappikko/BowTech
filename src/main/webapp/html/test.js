@@ -17,21 +17,17 @@ function loadList(pn) {
   $.getJSON('../../bowtech/app/board/list?pageNo=' + pn + '&pageSize=' + pageSize, 
     function(obj) {
       
-      console.log(obj);
       pageNo = obj.pageNo;
     
       // TR 태그를 생성하여 테이블 데이터를 갱신한다.
       tbody.html(''); // 이전에 출력한 내용을 제거한다.
 
+      // obj의 날짜에서 시간을 뺀다.
       var board = obj;
       
-      // row의 제목 길이 제한 및 날짜에서 시간을 뺀다.
       board.list.forEach(function(item){
-        
-        if (item.title.length > 20) {
-          item.title = item.title.substring(0,20) + '...';
-        }
-        item.createdDate = item.createdDate.substring(0,10);
+        var createdDate = item.createdDate.substring(0,10);
+        item.createdDate = createdDate;
       });
       
       // 템플릿 엔진을 실행하여 tr 태그 목록을 생성한다. 그리고 바로 tbody에 붙인다.
@@ -74,25 +70,19 @@ $('#nextPage > a').click((e) => {
 
 // 검색 버튼 클릭이벤트
 $('#search-btn').click(() => {
-  searchResult($(this).siblings('input[type="text"]'));
+  pageNo = 1;
+  keyword = $("#search-form").children('input[type="text"]').val();
+  window.location.href = 'search.html?keyword=' + keyword;
 });
 
 // 검색 엔터 이벤트
 $("#search-form").children('input[type="text"]').keydown(function(key) {
   if (key.which == 13) {
-    searchResult($(this));
+    pageNo = 1;
+    keyword = $("#search-form").children('input[type="text"]').val();
+    window.location.href = 'search.html?keyword=' + keyword;
   }
 });
-
-function searchResult(obj) {
-  if (obj.val().length < 1) {
-    alert('키워드를 입력하세요!');
-    return false;
-  }
-  pageNo = 1;
-  keyword = obj.val();
-  window.location.href = 'search.html?keyword=' + keyword;
-}
 
 // 페이지를 출력한 후 1페이지 목록을 로딩한다.
 loadList(pageNo);

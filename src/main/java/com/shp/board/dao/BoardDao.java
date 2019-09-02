@@ -5,14 +5,14 @@ import java.util.Map;
 import com.shp.board.domain.Board;
 
 public interface BoardDao {
-  int insert(Board board);
-  List<Board> findAllWithPage(Map<String,Object> params);
-  List<Board> findAll();
-  Board findByNo(int no);
-  int increaseCount(int no);
-  int update(Board board);
-  int delete(int no);
-  int countAll();
+  int insert(Board board) throws Exception;
+  List<Board> findAll(Map<String,Object> params) throws Exception;
+  Board findByNo(int no) throws Exception;
+  int increaseCount(int no) throws Exception;
+  int update(Board board) throws Exception;
+  int delete(int no) throws Exception;
+  int countAll(String keyword) throws Exception;
+  int findPassword(Map<String,Object> params) throws Exception;
 }
 
 

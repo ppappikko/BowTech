@@ -8,6 +8,7 @@
   
   <resultMap type="board" id="boardMap">
     <id column="board_id" property="no"/>
+    <result column="rownum" property="rowNo"/>
     <result column="titl" property="title"/>
     <result column="conts" property="contents"/>
     <result column="cdt" property="createdDate"/>
@@ -31,41 +32,46 @@
   </sql>
   
   <!-- 리스트 -->
-  <select id="findAllWithPage" resultMap="boardMap" parameterType="map">
+  <select id="findAll" resultMap="boardMap" parameterType="map">
     select
       board_id,
+      @rownum:=@rownum+1 as rownum,
       titl,
       cdt,
       vw_cnt,
       usr,
       is_del
     from 
-      bow_board
+      bow_board,
+      (select @rownum:=0) TMP
+    <where>
+      <if test="keyword != null">
+        <bind name="pattern1" value="'%' + keyword + '%'"/>
+        titl like #{pattern1}
+        or conts like #{pattern1}
+      </if>
+    </where>
     order by 
-      board_id desc
+      cdt desc, rownum desc
     <if test="size != null and rowNo != null">
       limit #{rowNo}, #{size}
     </if>
   </select>
   
-  <!-- 리스트 -->
-  <select id="findAll" resultMap="boardMap">
+  <!-- 상세 -->
+  <select id="findByNo" resultMap="boardMap" parameterType="int">
     select
       board_id,
       titl,
+      conts,
       cdt,
       vw_cnt,
       usr,
+      cmt_cnt,
+      atch_file_cnt,
       is_del
     from 
       bow_board
-    order by 
-      board_id desc
-  </select>
-  
-  <!-- 상세 -->
-  <select id="findByNo" resultMap="boardMap" parameterType="int">
-    <include refid="select1"/>
     where 
       board_id = #{value}
   </select>
@@ -98,6 +104,7 @@
   <update id="update" parameterType="board">
     update bow_board 
     set 
+      titl = #{title},
       conts = #{contents} 
     where board_id = #{no}
   </update>
@@ -107,11 +114,32 @@
     delete from bow_board 
     where board_id = #{no}
   </delete>
-  
+
   <!-- 전체글 개수 -->
-  <select id="countAll" resultType="int">
-    select count(*) from bow_board
+  <select id="countAll" resultType="int" parameterType="string">
+    select count(*) 
+    from 
+      bow_board
+    <where>
+      <if test="keyword != null">
+        <bind name="pattern1" value="'%' + keyword + '%'"/>
+        titl like #{pattern1}
+        or conts like #{pattern1}
+      </if>
+    </where>
   </select>
+  
+  <!-- 비밀번호 체크 -->
+  <select id="findPassword" resultType="int" parameterType="map">
+    select
+      count(*)
+    from 
+      bow_board
+    where
+      board_id = #{no}
+      and pwd = password(#{password})
+  </select>
+  
 </mapper>
 
 

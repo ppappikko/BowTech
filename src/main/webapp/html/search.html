@@ -7,15 +7,15 @@
 
   <link rel="stylesheet" href="/bowtech/node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/bowtech/css/common.css">
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="search.css">
 </head>
 <body>
   <header></header>
   <div class="container">
-    <h2>게시판</h2>
+    <h2>검색 결과</h2>
     <p><a href='./form.html' class="btn btn-primary btn-sm">새 글</a></p>
     
-    <div class="bow-list" style="min-height:467px">
+    <div class="row bow-list justify-content-center" style="min-height:467px">
     <table class="table table-striped table-hover mb-0">
     <thead>
       <tr> 
@@ -30,18 +30,26 @@
     </table>
     </div>
     <hr class="mt-0">
-    
-    <nav aria-label="목록 페이지 이동">
-      <ul class="pagination justify-content-center">
-        <li id="prevPage" class="page-item">
-          <a class="page-link" 
-            href="?pageNo=0&pageSize=3">이전</a></li>
-        <li id="currPage" class="page-item active"><span class="page-link">1</span></li>
-        <li id="nextPage" class="page-item ">
-          <a class="page-link" 
-             href="?pageNo=2&pageSize=3">다음</a></li>
-      </ul>
-    </nav>
+    <div class="row">
+      <div class="col-sm-2">
+        <a class="btn btn-primary btn-sm" href='.'>목록</a> 
+      </div>
+      <div class="col-sm-8">
+        <nav aria-label="목록 페이지 이동">
+          <ul class="pagination justify-content-center">
+            <li id="prevPage" class="page-item">
+              <a class="page-link" 
+                href="?pageNo=0&pageSize=3">이전</a></li>
+            <li id="currPage" class="page-item active"><span class="page-link">1</span></li>
+            <li id="nextPage" class="page-item ">
+              <a class="page-link" 
+                 href="?pageNo=2&pageSize=3">다음</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-sm-2">
+      </div>
+    </div> <!-- row -->
     
     <div id="search-form" class="form-inline my-2 justify-content-center">
       <input name="search" class="form-control mr-sm-2" type="text" placeholder="제목 + 내용" aria-label="검색">
@@ -65,12 +73,13 @@
 {{/each}}
 </script>
 
+  
   <script src="/bowtech/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/bowtech/node_modules/popper.js/dist/popper.js"></script>
   <script src="/bowtech/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   
   <script src="/bowtech/node_modules/handlebars/dist/handlebars.js"></script>
   
-  <script src="index.js"></script>
+  <script src="search.js"></script>
 </body>
 </html>

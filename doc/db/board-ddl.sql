@@ -17,7 +17,7 @@ create table bow_board (
   udt datetime null,
   vw_cnt int null default 0,
   usr varchar(20) not null,
-  pwd varchar(255) not null default '1111',
+  pwd varchar(255) not null,
   cmt_cnt int null default 0,
   is_del boolean null default false,
   atch_file_cnt int null default 0
@@ -30,7 +30,7 @@ create table bow_comment (
   cdt datetime not null default now(),
   udt datetime null,
   usr varchar(20) not null,
-  pwd varchar(20) not null default '1111',
+  pwd varchar(20) not null,
   board_id int not null,
   constraint fk_bow_comment foreign key (board_id) references bow_board(board_id)
 );
