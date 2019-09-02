@@ -86,7 +86,7 @@ public class BoardController {
   // 리스트 
   @GetMapping("list")
   public Object list(
-      @RequestParam(defaultValue="1") int pageNo,
+      @RequestParam int pageNo,
       @RequestParam(defaultValue="10") int pageSize,
       @RequestParam(defaultValue="") String keyword) {
     

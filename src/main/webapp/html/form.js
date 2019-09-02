@@ -115,6 +115,10 @@ $('#update-btn').click((e) => {
     return false;
   }
   
+  if (!confirm('정말 변경하시겠습니까?')) {
+    return false;
+  }
+  
   $.ajax({
     url:'../../bowtech/app/board/update',
     type: 'post',

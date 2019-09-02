@@ -1,5 +1,6 @@
 var pageNo = 1,
     pageSize = 10,
+    totalPage = 0,
     keyword = '',
     tbody = $('tbody'),
     prevPageLi = $('#prevPage'),
@@ -18,8 +19,7 @@ function loadList(pn) {
     function(obj) {
       
       console.log(obj);
-      pageNo = obj.pageNo;
-    
+      
       // TR 태그를 생성하여 테이블 데이터를 갱신한다.
       tbody.html(''); // 이전에 출력한 내용을 제거한다.
 
@@ -37,9 +37,26 @@ function loadList(pn) {
       // 템플릿 엔진을 실행하여 tr 태그 목록을 생성한다. 그리고 바로 tbody에 붙인다.
       $(trGenerator(board)).appendTo(tbody);
       
-      // 현재 페이지의 번호를 갱신한다.
-      currSpan.html(String(pageNo));
-   
+      // page 리스트 생성
+      pageNo = obj.pageNo;
+      totalPage = obj.totalPage;
+      
+      var bottomLimit = 3;
+      var startPage = (Math.floor((pn-1)/bottomLimit))*bottomLimit+1;
+      var endPage = startPage+bottomLimit-1;
+      
+      if (totalPage < endPage) {
+        endPage = totalPage;
+      }
+      
+      $('.page-item').remove();
+      
+      for (var i = startPage; i <= endPage; i++) {
+        
+        $('.pagination').append(
+            '<li class="page-item"><a class="page-link" href="#" data-no="'+ i +'">'+ i +'</a></li>');
+      }
+      
       // 1페이지일 경우 버튼을 비활성화 한다.
       if (pageNo <= 1) {
         prevPageLi.addClass('disabled');
@@ -73,7 +90,7 @@ $('#nextPage > a').click((e) => {
 });
 
 // 검색 버튼 클릭이벤트
-$('#search-btn').click(() => {
+$('#search-btn').click(function() {
   searchResult($(this).siblings('input[type="text"]'));
 });
 
@@ -105,6 +122,13 @@ $(document.body).bind('loaded-list', () => {
     window.location.href = 'view.html?no=' + 
       $(e.target).attr('data-no');
   });
+  
+  $('.page-link').click((e) => {
+    e.preventDefault();
+    console.log($(e.target).attr('data-no'));
+    loadList($(e.target).attr('data-no'));
+  });
+  
 });
 
 
