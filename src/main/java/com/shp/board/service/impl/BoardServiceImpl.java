@@ -56,6 +56,7 @@ public class BoardServiceImpl implements BoardService {
   public int update(Board board) throws Exception {
     // 이 메서드도 별로 할 일이 없다.
     // 그냥 DAO를 실행시키고 리턴 값을 그대로 전달한다.
+    System.out.println(board.getPassword());
     return boardDao.update(board);
   }
   

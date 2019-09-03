@@ -89,7 +89,7 @@ public class BoardController {
       @RequestParam int pageNo,
       @RequestParam(defaultValue="10") int pageSize,
       @RequestParam(defaultValue="") String keyword) {
-    
+    System.out.println(keyword);
     if (pageSize < 10 || pageSize > 10) 
       pageSize = 10;
     

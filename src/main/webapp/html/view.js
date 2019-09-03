@@ -5,7 +5,7 @@ var param = location.href.split('?')[1],
 
 // 목록 버튼 클릭이벤트
 $("#back-btn").click((e) => {
-  window.history.back();
+  window.location.href = '.';
 });
 
 // 업데이트 버튼 클릭 이벤트
@@ -70,7 +70,6 @@ function boardDelete() {
       function(obj) {
     
     if (obj.status == 'success') {
-      alert('삭제 되었습니다.');
       window.location.href = '.';
     } else {
       alert('삭제 실패!');

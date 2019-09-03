@@ -105,6 +105,10 @@
     update bow_board 
     set 
       titl = #{title},
+      usr = #{user},
+      <if test="password != null and password != ''">
+        pwd = password(#{password}),
+      </if>
       conts = #{contents} 
     where board_id = #{no}
   </update>

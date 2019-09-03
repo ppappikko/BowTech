@@ -73,7 +73,6 @@ $('#add-btn').click((e) => {
     contentType: "application/x-www-form-urlencoded",
     success: function(data) {
       if (data.status == 'success') {
-        alert('등록 성공!');
         location.href = "index.html";
       } else {
         alert('등록 실패!')
@@ -91,6 +90,8 @@ $('#update-btn').click((e) => {
   
   no = $('#no').val(),
   title = $('#title').val(),
+  user = $('#user').val(),
+  password = $('#password').val(),
   contents = $('#contents').val();
   
   if (title.length < 1) {
@@ -124,11 +125,12 @@ $('#update-btn').click((e) => {
     type: 'post',
     data: "no=" + encodeURIComponent(no) +
     "&title=" + encodeURIComponent(title) +
+    "&user=" + encodeURIComponent(user) +
+    "&password=" + encodeURIComponent(password) +
     "&contents=" + encodeURIComponent(contents),
     contentType: "application/x-www-form-urlencoded",
     success: function(data) {
       if (data.status == 'success') {
-        alert('변경 성공!');
         location.href = "view.html?no=" + no;
       } else {
         alert('변경 실패!')
@@ -156,6 +158,7 @@ function loadData(no) {
         
         $('#no').val(board.no);
         $('#title').val(board.title);
+        $('#user').val(board.user);
         $('#contents').val(board.contents);
         
         $('.count-num').html(board.contents.length);
@@ -168,27 +171,26 @@ function loadData(no) {
 // 제목
 // blur 이벤트
 $('#title').blur(function() {
-  if ($(this).val().startsWith('&nbsp;') ||
-      $(this).val().startsWith(' ')) {
+  if ($(this).val().startsWith(' ')) {
     alert('제목은 공백으로 시작할 수 없습니다.');
     $(this).val($(this).val().trim()).focus();
   }
-  if ($(this).val().endsWith('&nbsp;') ||
-      $(this).val().endsWith(' ')) {
+  if ($(this).val().endsWith(' ')) {
     $(this).val($(this).val().trim());
   }
+  titleLength($(this));
 });
 // keyup 이벤트
 $('#title').keyup(function() {
-  if ($(this).val().length > 30) {
-    titleLength($(this));
-  }
+  titleLength($(this));
 });
 // 글자 수 제한 함수
 function titleLength(obj) {
-  alert('제목은 30자까지 입력할 수 있습니다.');
-  title = obj.val(obj.val().substring(0,30));
-  obj.focus();
+  if (obj.val().length > 30) {
+    alert('제목은 30자까지 입력할 수 있습니다.');
+    title = obj.val(obj.val().substring(0,30));
+    obj.focus();
+  }
 }
 
 // 작성자
@@ -226,19 +228,21 @@ $("#password").keyup(function(event){
 });
 
 // 내용
-// keyup 이벤트
-$('#contents').keyup(function() {
-  $('.count-num').html($(this).val().length);
-  if ($(this).val().length > 500) {
-    contentsLength($(this));
-  }
+// blur & keyup 이벤트
+$('#contents').blur(function() {
+  contentsLength($(this));
+}).keyup(function() {
+  contentsLength($(this));
 });
 // 글자 수 제한 함수
 function contentsLength(obj) {
-  alert('내용은 500자까지 입력할 수 있습니다.');
-  contents = obj.val(obj.val().substring(0,500));
-  $('.count-num').html(500);
-  obj.focus();
+  $('.count-num').html(obj.val().length);
+  if (obj.val().length > 500) {
+    alert('내용은 500자까지 입력할 수 있습니다.');
+    contents = obj.val(obj.val().substring(0,500));
+    $('.count-num').html(500);
+    obj.focus();
+  }
 }
 
 
