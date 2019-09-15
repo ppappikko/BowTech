@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.shp.board.dao.CommentDao">
+  
+  <resultMap type="comment" id="commentMap">
+    <id column="comment_id" property="no"/>
+    <id column="board_id" property="boardNo"/>
+    <result column="parent_id" property="parentNo"/>
+    <result column="g_ord" property="groupOrd"/>
+    <result column="depth" property="depth"/>
+    <result column="conts" property="contents"/>
+    <result column="cdt" property="createdDate"/>
+    <result column="udt" property="updateDate"/>
+    <result column="usr" property="user"/>
+    <result column="pwd" property="password"/>
+  </resultMap>
+  
+  <sql id="select1">
+    select 
+      board_id, 
+      conts, 
+      cdt, 
+      vw_cnt 
+    from 
+      bow_board
+  </sql>
+  
+  <!-- 생성 -->
+  <insert id="insert" parameterType="comment">
+    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+        select ifNull(Max(comment_id), 0) + 1
+        from bow_comment
+    </selectKey>
+
+    insert into bow_comment(
+    comment_id,
+    board_id,
+    parent_id,
+    depth,
+    g_ord,
+    conts,
+    usr,
+    pwd
+    ) 
+    values(
+    #{no},
+    #{boardNo},
+    <choose>
+       <when test="parentNo == null or parentNo == 0">#{no}, 0,</when>
+       <otherwise>#{parentNo}, #{depth},</otherwise>
+    </choose>
+    #{groupOrd},
+    #{contents},
+    #{user},
+    password(#{password})
+    )
+  </insert>
+  
+  <!-- 리스트 -->
+  <select id="findAll" resultMap="commentMap" parameterType="map">
+    select
+      comment_id,
+      board_id,
+      parent_id,
+      g_ord,
+      depth,
+      conts,
+      cdt,
+      usr
+    from 
+      bow_comment
+    where
+      board_id = #{boardNo}
+    order by 
+      g_ord desc, cdt desc
+    <if test="size != null and rowNo != null">
+      limit #{rowNo}, #{size}
+    </if>
+  </select>
+  
+  <!-- 부모 번호로 조회 -->
+  <select id="findByParentNo" resultMap="commentMap" parameterType="int">
+    select
+      comment_id,
+      depth + 1 depth,
+      g_ord
+    from 
+      bow_comment
+    where
+      comment_id = #{parentNo}
+  </select>
+  
+  <!-- 일반 댓글로 부모 번호가 없을 시 해당 게시글 내의 댓글 순번 -->
+  <select id="findOrderByBoardNo" resultType="int" parameterType="int">
+    select
+      ifNull(Max(g_ord), 0) + 1
+    from 
+      bow_comment
+    where
+      board_id = #{boardNo}
+  </select>
+  
+  <!-- 그룹의 순번 수정 -->
+  <update id="updateGroupOrd" parameterType="comment">
+    update bow_comment 
+    set 
+      g_ord = g_ord + 1
+    where
+      comment_id = #{no} and g_ord > #{groupOrd}
+  </update>
+  
+  <!-- 수정 -->
+  <update id="update" parameterType="comment">
+    update bow_comment 
+    set 
+      usr = #{user},
+      <if test="password != null and password != ''">
+        pwd = password(#{password}),
+      </if>
+      conts = #{contents} 
+    where
+      comment_id = #{no}
+  </update>
+  
+  <!-- 삭제 -->
+  <delete id="delete" parameterType="int">
+    delete from bow_comment 
+    where comment_id = #{no}
+  </delete>
+
+  <!-- 전체글 개수 -->
+  <select id="countAll" resultType="int" parameterType="int">
+    select count(*) 
+    from 
+      bow_comment
+    where
+      board_id = #{boardNo}
+  </select>
+  
+  <!-- 비밀번호 체크 -->
+  <select id="findPassword" resultType="int" parameterType="map">
+    select
+      count(*)
+    from 
+      bow_comment
+    where
+      comment_id = #{no}
+      and pwd = password(#{password})
+  </select>
+  
+</mapper>
+
+
+
+
+
+
+
+
+
+

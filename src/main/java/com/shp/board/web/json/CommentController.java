@@ -9,33 +9,32 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.shp.board.domain.Board;
-import com.shp.board.service.BoardService;
+import com.shp.board.domain.Comment;
+import com.shp.board.service.CommentService;
 
 
 // AJAX 기반 JSON 데이터를 다루는 컨트롤러
 @RestController
-@RequestMapping("/board")
-public class BoardController {
+@RequestMapping("/comment")
+public class CommentController {
   
   // DI
-  @Autowired BoardService boardService;
+  @Autowired CommentService commentService;
   
   @PostMapping("add")
-  public Object add(Board board) {
+  public Object add(Comment comment) {
     HashMap<String,Object> content = new HashMap<>();
     
     try {
       
-      if (board.getTitle() == "" || 
-          board.getUser() == "" ||
-          board.getPassword() == "" ||
-          board.getContents() == ""
+      if (comment.getUser() == "" ||
+          comment.getPassword() == "" ||
+          comment.getContents() == ""
           ) {
         throw new Exception("제목, 작성자, 비밀번호, 내용을 입력하세요");
       }
       
-      boardService.add(board);
+      commentService.add(comment);
       content.put("status", "success");
     } catch (Exception e) {
       content.put("status", "fail");
@@ -50,29 +49,9 @@ public class BoardController {
     HashMap<String,Object> content = new HashMap<>();
     
     try {
-      if (boardService.delete(no) == 0) 
+      if (commentService.delete(no) == 0) 
         throw new RuntimeException("해당 번호의 게시물이 없습니다.");
       content.put("status", "success");
-      
-    } catch (Exception e) {
-      content.put("status", "fail");
-      content.put("message", e.getMessage());
-    }
-    return content;
-  }
-  
-  @GetMapping("detail")
-  public Object detail(int no) {
-    
-    HashMap<String,Object> content = new HashMap<>();
-    Board board = new Board();
-    
-    try {
-      board = boardService.get(no);
-      if (board == null) 
-        throw new RuntimeException("해당 번호의 게시물이 없습니다.");
-      content.put("status", "success");
-      content.put("board", board);
       
     } catch (Exception e) {
       content.put("status", "fail");
@@ -84,17 +63,17 @@ public class BoardController {
   // 리스트 
   @GetMapping("list")
   public Object list(
+      @RequestParam int boardNo,
       @RequestParam int pageNo,
-      @RequestParam(defaultValue="10") int pageSize,
-      @RequestParam(defaultValue="") String keyword) {
+      @RequestParam(defaultValue="5") int pageSize) {
 
-    if (pageSize < 10 || pageSize > 10) 
-      pageSize = 10;
+    if (pageSize < 5 || pageSize > 5) 
+      pageSize = 5;
     
     HashMap<String,Object> content = new HashMap<>();
     try {
       // 전체 게시물의 개수
-      int rowCount = boardService.size(keyword);
+      int rowCount = commentService.size(boardNo);
       
       // 총 페이지 수
       int totalPage = rowCount / pageSize;
@@ -106,10 +85,10 @@ public class BoardController {
       else if (pageNo > totalPage)
         pageNo = totalPage;
       
-      List<Board> boards = boardService.list(pageNo, pageSize, keyword);
-      
+      List<Comment> comments = commentService.list(boardNo, pageNo, pageSize);
+      System.out.println(comments);
       content.put("status", "success");
-      content.put("list", boards);
+      content.put("list", comments);
       content.put("pageNo", pageNo);
       content.put("pageSize", pageSize);
       content.put("totalPage", totalPage);
@@ -122,17 +101,15 @@ public class BoardController {
   }
   
   @PostMapping("update")
-  public Object update(Board board) {
+  public Object update(Comment comment) {
     HashMap<String,Object> content = new HashMap<>();
     try {
       
-      if (board.getTitle() == "" || 
-          board.getContents() == ""
-          ) {
-        throw new Exception("제목 또는 내용을 입력하세요.");
+      if (comment.getContents() == "") {
+        throw new Exception("내용을 입력하세요.");
       }
       
-      if (boardService.update(board) == 0) 
+      if (commentService.update(comment) == 0) 
         throw new RuntimeException("해당 번호의 게시물이 없습니다.");
       content.put("status", "success");
       
@@ -144,14 +121,14 @@ public class BoardController {
   }
   
   @PostMapping("passwordcheck")
-  public Object passwordcheck(Board board) {
+  public Object passwordcheck(Comment comment) {
     
-    System.out.println(board);
+    System.out.println(comment);
     boolean result = false;
     Map<Object, Object> content = new HashMap<Object, Object>();
     
     try {
-      result = boardService.passwordCheck(board.getNo(), board.getPassword());
+      result = commentService.passwordCheck(comment.getNo(), comment.getPassword());
       content.put("status", "success");
       content.put("result", result);
       

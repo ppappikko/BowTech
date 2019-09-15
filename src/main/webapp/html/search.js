@@ -38,19 +38,13 @@ function loadList(pn, keyword) {
         return false;
       }
       
-      pageNo = obj.pageNo;
-    
       // TR 태그를 생성하여 테이블 데이터를 갱신한다.
       tbody.html(''); // 이전에 출력한 내용을 제거한다.
 
       var board = obj;
       
-      // row의 제목 길이 제한 및 날짜에서 시간을 뺀다.
+      // row의 날짜에서 시간을 뺀다.
       board.list.forEach(function(item){
-        
-        if (item.title.length > 20) {
-          item.title = item.title.substring(0,20) + '...';
-        }
         item.createdDate = item.createdDate.substring(0,10);
       });
       

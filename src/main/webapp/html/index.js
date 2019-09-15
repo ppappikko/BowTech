@@ -21,19 +21,13 @@ function loadList(pn) {
   $.getJSON('../../bowtech/app/board/list?pageNo=' + pn + '&pageSize=' + pageSize, 
     function(obj) {
       
-      console.log(obj);
-      
       // TR 태그를 생성하여 테이블 데이터를 갱신한다.
       tbody.html(''); // 이전에 출력한 내용을 제거한다.
 
       var board = obj;
       
-      // row의 제목 길이 제한 및 날짜에서 시간을 뺀다.
+      // row의 날짜에서 시간을 뺀다.
       board.list.forEach(function(item){
-        
-        if (item.title.length > 20) {
-          item.title = item.title.substring(0,20) + '...';
-        }
         item.createdDate = item.createdDate.substring(0,10);
       });
       
@@ -44,8 +38,11 @@ function loadList(pn) {
       pageNo = obj.pageNo;
       totalPage = obj.totalPage;
       
-      startPage = (Math.floor((pn - 1) / bottomLimit)) * bottomLimit + 1;
-      endPage = startPage+bottomLimit - 1;
+      // ex) 현재 페이지가 10 페이지인 경우 1 ~ 10 번호가 보여야 한다.
+      // 따라서 시작 번호가 1 이어야 하므로 나눈 후 버림 처리를 한다.
+      // 전 블록의 마지막 번호를 구해서 + 1한 값이 현재 블록의 첫번째 번호이다.
+      startPage = (Math.floor((pageNo - 1) / bottomLimit)) * bottomLimit + 1;
+      endPage = startPage + bottomLimit - 1;
       
       if (totalPage < endPage) {
         endPage = totalPage;

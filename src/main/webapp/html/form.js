@@ -58,6 +58,14 @@ $('#add-btn').click((e) => {
     return false;
   }
   
+  if (!checkPassword(password)) {
+    alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
+    setTimeout(function() {
+      $("#password").focus();
+    }, 10);
+    return false;
+  }
+  
   if (contents.length > 500) {
     contentsLength($('#contents'));
     return false;
@@ -75,7 +83,7 @@ $('#add-btn').click((e) => {
       if (data.status == 'success') {
         location.href = "index.html";
       } else {
-        alert('등록 실패!')
+        alert('등록 실패!');
       }
     },
     error: function() {
@@ -99,6 +107,11 @@ $('#update-btn').click((e) => {
     $('#title').focus();
     return false;
     
+  } else if (user.length < 1) {
+    alert('작성자 명을 입력하세요.');
+    $('#user').focus();
+    return false;
+    
   } else if (contents.length < 1 ||
       contents.trim().length == 0) {
     alert('내용을 입력하세요.');
@@ -108,6 +121,14 @@ $('#update-btn').click((e) => {
   
   if (title.length > 30) {
     titleLength($('#title'));
+    return false;
+  }
+  
+  if (!checkPassword(password)) {
+    alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
+    setTimeout(function() {
+      $("#password").focus();
+    }, 10);
     return false;
   }
   
@@ -220,10 +241,12 @@ function userLength(obj) {
 
 // 비밀번호
 // keyup 이벤트 (한글 입력 안되게 처리)
-$("#password").keyup(function(event){ 
-  if (!(event.keyCode >=37 && event.keyCode<=40)) {
-   var inputVal = $(this).val();
-   $(this).val(inputVal.replace(/[^a-z0-9]/gi,''));
+$("#password").blur(function() {
+  if (!checkPassword($(this).val())) {
+    alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
+    setTimeout(function() {
+      $("#password").focus();
+    }, 10);
   }
 });
 
@@ -245,7 +268,25 @@ function contentsLength(obj) {
   }
 }
 
-
+function checkPassword(password){
+  
+  if (password.length < 1) {
+    return true;
+  }
+  
+  if(!/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{6,25}$/.test(password)){
+    return false;
+  }    
+  var checkNumber = password.search(/[0-9]/g);
+  var checkEnglish = password.search(/[a-z]/ig);
+  if(checkNumber <0 || checkEnglish <0){
+    return false;
+  }
+  if(/(\w)\1\1\1/.test(password)){
+    return false;
+  }
+  return true;
+}
 
 
 

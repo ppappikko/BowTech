@@ -25,6 +25,9 @@ public class BoardServiceImpl implements BoardService {
     
     HashMap<String,Object> params = new HashMap<>();
     params.put("size", pageSize);
+    
+    // 전 페이지의 마지막 번호
+    // 현재 페이지 - 1 * 페이지 게시글 수
     params.put("rowNo", (pageNo - 1) * pageSize);
     
     if (keyword != "" && keyword != null) {
@@ -56,7 +59,6 @@ public class BoardServiceImpl implements BoardService {
   public int update(Board board) throws Exception {
     // 이 메서드도 별로 할 일이 없다.
     // 그냥 DAO를 실행시키고 리턴 값을 그대로 전달한다.
-    System.out.println(board.getPassword());
     return boardDao.update(board);
   }
   
