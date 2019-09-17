@@ -1,6 +1,7 @@
 
 var param = location.href.split('?')[1],
     board_no = param.split('=')[1],
+    comment_no = 0,
     passwordSwitch = 0,
     pageNo = 1,
     pageSize = 5,
@@ -31,6 +32,26 @@ $('#update-btn').click((e) => {
 $('#delete-btn').click(() => {
   $('#passwordModal').modal('show');
   passwordSwitch = 2; // 삭제
+});
+
+//이전, 다음 버튼 클릭 이벤트
+$('#prevPage > a').click((e) => {
+  e.preventDefault();
+  loadCommentList(board_no, startPage - 1);
+});
+$('#nextPage > a').click((e) => {
+  e.preventDefault();
+  loadCommentList(board_no, endPage + 1);
+});
+
+// 처음, 마지막 버튼 클릭 이벤트
+$('#firstPage > a').click((e) => {
+  e.preventDefault();
+  loadCommentList(board_no, 1);
+});
+$('#lastPage > a').click((e) => {
+  e.preventDefault();
+  loadCommentList(board_no, totalPage);
 });
 
 // 데이터 로딩 함수 호출
@@ -77,20 +98,52 @@ function loadCommentList(boardNo, pn) {
       
         commentList.empty(); // 이전에 출력한 댓글을 제거한다.
   
+        if (obj.status == 'fail') {
+          console.log(obj.message);
+          $('#firstPage').hide();
+          $('#prevPage').hide();
+          $('#nextPage').hide();
+          $('#lastPage').hide();
+          
+          return false;
+        }
         var comment = obj;
         
         console.log(comment);
-        console.log(comment.list[0]);
         
         // row의 날짜 가공
-        comment.list.forEach(function(item){
+        comment.parentList.forEach(function(item){
+          item.createdDate =
+            item.createdDate.substring(0,10) + " " + item.createdDate.substring(11,19);
+        });
+        comment.childrenList.forEach(function(item){
           item.createdDate =
             item.createdDate.substring(0,10) + " " + item.createdDate.substring(11,19);
         });
         
-        // 템플릿 엔진을 실행하여 tr 태그 목록을 생성한다. 그리고 바로 tbody에 붙인다.
+        // 템플릿 엔진을 실행하여 댓글 생성
         $(cmtGenerator(comment)).appendTo(commentList);
-      
+        
+        var cmtReplyList,
+            childrenList,
+            cmtReply;
+        
+        comment.parentList.forEach(function(item){
+          
+          cmtReplyList = $('#collapse-' + item.no + ' > ul');
+          childrenList = new Array();
+          
+          comment.childrenList.forEach(function(item2){
+            if (item.no == item2.parentNo) {
+              childrenList.push(item2);
+            }
+          });
+          
+          cmtReply = {childrenList : childrenList};
+          $(cmtReplyGenerator(cmtReply)).appendTo(cmtReplyList);
+        });
+        
+        
       // page 리스트 생성에 필요한 변수
       pageNo = obj.pageNo;
       totalPage = obj.totalPage;
@@ -101,8 +154,6 @@ function loadCommentList(boardNo, pn) {
       startPage = (Math.floor((pageNo - 1) / bottomLimit)) * bottomLimit + 1;
       endPage = startPage + bottomLimit - 1;
       
-      console.log(totalPage);
-      console.log(endPage);
       if (totalPage < endPage) {
         endPage = totalPage;
       }
@@ -115,13 +166,53 @@ function loadCommentList(boardNo, pn) {
 } // loadCommentList()
 
 $(document.body).bind('loaded-commentList', () => {
-  // 답글 버튼을 클릭했을 때 댓글의 답글 출력
-  $('.bow-comment-reply').click((e) => {
-    e.preventDefault();
-    console.log($(this));
-  });
+  
   // 페이징 목록을 만들어 주는 함수
   pageGenerator();
+  
+  // 대댓글 버튼 클릭 이벤트 등록 함수
+  ReplyAddClick();
+  
+  // 대댓글 이벤트 처리
+  // 작성자
+  // blur 이벤트
+  $('.reply-user').blur(function() {
+    var userExp = /^[가-힣|a-z|A-Z|0-9|\*]+$/;
+                
+    if ($(this).val().length > 0) {
+      if (!userExp.test($(this).val())) {
+        alert('한글, 영어, 숫자만 입력이 가능합니다.');
+        $(this).val('').focus();
+      }
+    }
+  });
+  // keyup 이벤트
+  $('.reply-user').keyup(function() {
+    if ($(this).val().length > $(this).attr('maxlength')) {
+      userLength($(this));
+    }
+  });
+  
+  // 비밀번호
+  // keyup 이벤트 (한글 입력 안되게 처리)
+  $(".reply-password").blur(function() {
+    var obj = $(this);
+    if (!checkPassword(obj.val())) {
+      alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
+      setTimeout(function() {
+        obj.focus();
+      }, 10);
+    }
+  });
+
+  // 내용
+  // blur & keyup 이벤트
+  $('.reply-contents').blur(function() {
+    contentsLength($(this));
+  }).keyup(function() {
+    contentsLength($(this));
+  });
+
 });
 
 // 페이징 목록을 만들어 주는 함수
@@ -234,6 +325,7 @@ $('#comment-btn').click((e) => {
         // 입력 폼 초기화 및 댓글 리스트 재출력
         $('.write-comment').find('input').val('');
         $('.write-comment').find('textarea').val('');
+        $('.count-num').html('0');
         loadCommentList(boardNo, 1);
       } else {
         alert('등록 실패!' + data.message);
@@ -245,6 +337,83 @@ $('#comment-btn').click((e) => {
   });
 
 });
+
+// 대댓글 등록 버튼 클릭이벤트
+function ReplyAddClick() {
+  // 댓글 삭제 버튼 클릭 이벤트
+  $('.cmt-delete-btn').click((e) => {
+    $('#passwordModal').modal('show');
+    comment_no = $(e.target).attr('data-no');
+    passwordSwitch = 3; // 댓글 삭제
+  });
+  
+  $('.reply-btn').click((e) => {
+    e.preventDefault();
+    
+    var boardNo = board_no,
+        parentNo = $(e.target).attr('data-no');
+        user = $('#reply-write-' + parentNo + ' input[name="user"]').val(),
+        password = $('#reply-write-' + parentNo + ' input[name="password"]').val(),
+        contents = $('#reply-write-' + parentNo + ' textarea[name="contents"]').val();
+        
+    if (user.length < 1) {
+      alert('작성자 명을 입력하세요.');
+      $('#reply-write-' + parentNo + ' input[name="user"]').focus();
+      return false;
+      
+    } else if (password.length < 1) {
+      alert('비밀번호를 입력하세요.');
+      $('#reply-write-' + parentNo + ' input[name="password"]').focus();
+      return false;
+      
+    } else if (contents.length < 1 ||
+        contents.trim().length == 0) {
+      alert('내용을 입력하세요.');
+      $('#reply-write-' + parentNo + ' textarea[name="contents"]').val('');
+      $('#reply-write-' + parentNo + ' textarea[name="contents"]').focus();
+      return false;
+    }
+    
+    if (!checkPassword(password)) {
+      alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
+      setTimeout(function() {
+        $('#reply-write-' + parentNo + ' input[name="password"]').focus();
+      }, 10);
+      return false;
+    }
+    
+    if (contents.length > 200) {
+      contentsLength($('#reply-write-' + parentNo + ' textarea[name="contents"]'));
+      return false;
+    }
+    
+    $.ajax({
+      url:'../../bowtech/app/comment/add',
+      type: 'post',
+      data: "boardNo=" + boardNo +
+      "&parentNo=" + parentNo +
+      "&user=" + encodeURIComponent(user) +
+      "&password=" + encodeURIComponent(password) +
+      "&contents=" + encodeURIComponent(contents),
+      contentType: "application/x-www-form-urlencoded",
+      success: function(data) {
+        if (data.status == 'success') {
+          // 입력 폼 초기화 및 댓글 리스트 재출력
+          $('#reply-write-' + parentNo).find('input').val('');
+          $('#reply-write-' + parentNo).find('textarea').val('');
+          $('#reply-write-' + parentNo).find('.reply-count-num').html('0');
+          loadCommentList(boardNo, 1);
+        } else {
+          alert('등록 실패!' + data.message);
+        }
+      },
+      error: function() {
+        alert('등록 실패!');
+      }
+    });
+  
+  });
+}
 
 // 변경, 삭제
 // password 입력 후 확인 버튼
@@ -260,7 +429,7 @@ $('#passwordModal').on('hidden.bs.modal', () => {
   $('#password-confirm').focus();
 });
 
-// 삭제 함수
+// 게시글 삭제 함수
 function boardDelete() {
   $.getJSON('../../bowtech/app/board/delete?no=' + board_no, 
       function(obj) {
@@ -273,10 +442,24 @@ function boardDelete() {
   }); // getJSON()
 }
 
+// 댓글 삭제 함수
+function commentDelete() {
+  $.getJSON('../../bowtech/app/comment/delete?no=' + comment_no, 
+      function(obj) {
+    
+    if (obj.status == 'success') {
+      loadCommentList(board_no, 1);
+      $('#passwordModal').modal('hide');
+    } else {
+      alert('삭제 실패!');
+    }
+  }); // getJSON()
+}
+
 // 비밀번호 엔터 이벤트
 $("#password-confirm").keydown(function(key) {
   if (key.which == 13) {
-    passwordConfirm($(this));
+    passwordConfirm();
   }
 });
 
@@ -291,36 +474,67 @@ function passwordConfirm() {
     return false;
   }
   
-  $.ajax({
-    async: true,
-    type : 'POST',
-    data : {no : board_no, password : password},
-    url : "../../bowtech/app/board/passwordcheck",
-    success : function(data) {
-      if (!data.result){
-        alert('비밀번호가 틀렸습니다!');
-        $('#password-confirm').focus();
-        return false;
-      }
-      
-      if (passwordSwitch == 1) {
-        passwordSwitch = 0;
-        window.location.href = 'form.html?no=' + board_no;
+  // 댓글의 삭제 버튼 클릭 시
+  if (passwordSwitch == 3) {
+    
+    $.ajax({
+      async: true,
+      type : 'POST',
+      data : {no : comment_no, password : password},
+      url : "../../bowtech/app/comment/passwordcheck",
+      success : function(data) {
+        if (!data.result){
+          alert('비밀번호가 틀렸습니다!');
+          $('#password-confirm').focus();
+          return false;
+        }
         
-      } else if (passwordSwitch == 2) {
         if (!confirm('정말 삭제 하시겠습니까?')) {
           return false;
         } else {
           passwordSwitch = 0;
-          boardDelete();
+          commentDelete();
         }
+      },
+      error : function(error) {
+        alert('오류 발생!');
+        return false;
       }
-    },
-    error : function(error) {
-      alert('오류 발생!');
-      return false;
-    }
-  });
+    });
+  } else {
+    
+    $.ajax({
+      async: true,
+      type : 'POST',
+      data : {no : board_no, password : password},
+      url : "../../bowtech/app/board/passwordcheck",
+      success : function(data) {
+        if (!data.result){
+          alert('비밀번호가 틀렸습니다!');
+          $('#password-confirm').focus();
+          return false;
+        }
+        
+        if (passwordSwitch == 1) {
+          passwordSwitch = 0;
+          window.location.href = 'form.html?no=' + board_no;
+          
+        } else if (passwordSwitch == 2) {
+          if (!confirm('정말 삭제 하시겠습니까?')) {
+            return false;
+          } else {
+            passwordSwitch = 0;
+            boardDelete();
+          }
+        }
+      },
+      error : function(error) {
+        alert('오류 발생!');
+        return false;
+      }
+    });
+  }
+  
 }
 
 // 작성자
@@ -351,10 +565,11 @@ function userLength(obj) {
 // 비밀번호
 // keyup 이벤트 (한글 입력 안되게 처리)
 $("#comment-password").blur(function() {
-  if (!checkPassword($(this).val())) {
+  var obj = $(this);
+  if (!checkPassword(obj.val())) {
    alert('숫자,영문자,특수문자 조합으로\n중복문자 4개 이하\n6자리 이상 사용해야 합니다');
    setTimeout(function() {
-     $("#comment-password").focus();
+     obj.focus();
    }, 10);
   }
 });
@@ -368,11 +583,11 @@ $('#comment-contents').blur(function() {
 });
 // 글자 수 제한 함수
 function contentsLength(obj) {
-$('.count-num').html(obj.val().length);
+  obj.parents('.row').next().find('.count-num').html(obj.val().length);
   if (obj.val().length > 200) {
    alert('내용은 200자까지 입력할 수 있습니다.');
    contents = obj.val(obj.val().substring(0,200));
-   $('.count-num').html(200);
+   obj.parents('.row').next().find('.count-num').html(200);
    obj.focus();
   }
 }

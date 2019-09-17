@@ -61,6 +61,7 @@ public class CommentController {
   }
   
   // 리스트 
+  @SuppressWarnings("unchecked")
   @GetMapping("list")
   public Object list(
       @RequestParam int boardNo,
@@ -75,6 +76,10 @@ public class CommentController {
       // 전체 게시물의 개수
       int rowCount = commentService.size(boardNo);
       
+      if (rowCount == 0) {
+        throw new RuntimeException("해당 번호의 게시물이 없습니다.");
+      }
+      
       // 총 페이지 수
       int totalPage = rowCount / pageSize;
       if (rowCount % pageSize > 0)
@@ -85,10 +90,26 @@ public class CommentController {
       else if (pageNo > totalPage)
         pageNo = totalPage;
       
-      List<Comment> comments = commentService.list(boardNo, pageNo, pageSize);
-      System.out.println(comments);
+      Map<String,Object> list = commentService.list(boardNo, pageNo, pageSize);
+      List<Comment> parentList = (List<Comment>) list.get("parentList");
+      List<Comment> childrenList = (List<Comment>) list.get("childrenList");
+      
+      // 댓글의 답글 수
+      int totalReplyCount = 0;
+      
+      for (Comment p : parentList) {
+        for (Comment c : childrenList) {
+          if (p.getNo() == c.getParentNo()) {
+            totalReplyCount++;
+          }
+        }
+        p.setReplyCount(totalReplyCount);
+        totalReplyCount = 0;
+      }
+      
       content.put("status", "success");
-      content.put("list", comments);
+      content.put("parentList", parentList);
+      content.put("childrenList", childrenList);
       content.put("pageNo", pageNo);
       content.put("pageSize", pageSize);
       content.put("totalPage", totalPage);
@@ -123,7 +144,6 @@ public class CommentController {
   @PostMapping("passwordcheck")
   public Object passwordcheck(Comment comment) {
     
-    System.out.println(comment);
     boolean result = false;
     Map<Object, Object> content = new HashMap<Object, Object>();
     

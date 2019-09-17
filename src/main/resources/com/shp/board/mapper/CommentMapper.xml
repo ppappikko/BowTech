@@ -74,12 +74,31 @@
     from 
       bow_comment
     where
-      board_id = #{boardNo}
+      board_id = #{boardNo} and depth = 0
     order by 
       g_ord desc, cdt desc
     <if test="size != null and rowNo != null">
       limit #{rowNo}, #{size}
     </if>
+  </select>
+  
+  <!-- 리스트 -->
+  <select id="findAllChildren" resultMap="commentMap" parameterType="int">
+    select
+      comment_id,
+      board_id,
+      parent_id,
+      g_ord,
+      depth,
+      conts,
+      cdt,
+      usr
+    from 
+      bow_comment
+    where
+      board_id = #{boardNo} and depth > 0
+    order by 
+      g_ord asc, cdt desc
   </select>
   
   <!-- 부모 번호로 조회 -->
@@ -104,13 +123,23 @@
       board_id = #{boardNo}
   </select>
   
-  <!-- 그룹의 순번 수정 -->
+  <!-- 대댓글 그룹의 순번 수정 -->
   <update id="updateGroupOrd" parameterType="comment">
     update bow_comment 
     set 
       g_ord = g_ord + 1
     where
-      comment_id = #{no} and g_ord > #{groupOrd}
+      parent_id = #{no} and g_ord > #{groupOrd}
+  </update>
+  
+  <!-- 삭제시 그룹의 순번 수정 -->
+  <update id="updateGroupOrdDelete" parameterType="int">
+    update bow_comment a
+    inner join bow_comment b on b.board_id = a.board_id and a.g_ord > b.g_ord
+    set 
+      a.g_ord = a.g_ord - 1
+    where
+      b.comment_id = #{no}
   </update>
   
   <!-- 수정 -->
@@ -138,7 +167,7 @@
     from 
       bow_comment
     where
-      board_id = #{boardNo}
+      board_id = #{boardNo} and depth = 0
   </select>
   
   <!-- 비밀번호 체크 -->

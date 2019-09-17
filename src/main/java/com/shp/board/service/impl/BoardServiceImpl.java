@@ -2,6 +2,7 @@ package com.shp.board.service.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.shp.board.dao.BoardDao;
 import com.shp.board.domain.Board;
@@ -14,11 +15,8 @@ import com.shp.board.service.BoardService;
 @Service
 public class BoardServiceImpl implements BoardService {
   
+  @Autowired
   BoardDao boardDao;
-  
-  public BoardServiceImpl(BoardDao boardDao) {
-    this.boardDao = boardDao;
-  }
   
   @Override
   public List<Board> list(int pageNo, int pageSize, String keyword) throws Exception {

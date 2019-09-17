@@ -153,19 +153,56 @@
   <footer></footer>
 
 <script id="cmt-template" type="text/x-handlebars-template">
-{{#each list}}
+{{#each parentList}}
 <li class="list-group-item">
   <div class="comment-box">
-    <p><strong>{{user}}</strong></p>
+    <div class="row mb-1">
+      <div class="col-sm-10"><strong>{{user}}</strong></div>
+      <div class="col-sm-2 text-right">
+<button type="button" class="cmt-delete-btn btn btn-primary btn-sm" data-no="{{no}}">삭제</button></div>
+    </div>
     <p class="cmt-contents">{{contents}}</p>
     <p><span>{{createdDate}}</span></p>
-    <div><a class="bow-comment-reply" href="#" data-no="{{no}}"><span>답글</span><span>{{replyCount}}</span></a></div>
+    <div><a class="bow-comment-reply" data-toggle="collapse" href="#collapse-{{no}}" 
+role="button" aria-expanded="false" aria-controls="collapse-{{no}}">답글 {{replyCount}}</a></div>
   </div>
-  <div class="reply-area" style="display:none;">
-    <ul>
+  <div class="reply-area collapse" id="collapse-{{no}}">
+    <ul class="list-group list-group-flush">
     </ul>
-    <div class="reply-write">
-      댓글에 대한 답글 작성 폼
+    <div id="reply-write-{{no}}" class="border border-light bg-light rounded p-3">
+      <!-- 댓글 작성자 & 비밀번호 -->
+      <div class="form-group row">
+        <div class="col-sm-6">
+          <label for="user" class="col-form-label">작성자</label>
+          <input type="text"class="form-control reply-user" 
+                    name="user" maxlength="6"></input>
+        </div>
+        <div class="col-sm-6">
+          <label for="password" class="col-form-label">비밀번호</label>
+          <input type="password" class="form-control reply-password" 
+                    name="password" maxlength="25"></input>
+        </div>
+      </div>
+      <!-- 댓글 내용 -->
+      <div class="form-group row">
+        <div class="col-sm-12">
+        <label for="contents" class="col-form-label">내용</label>
+          <textarea class="form-control reply-contents" 
+                    name="contents" rows="3" wrap="hard" 
+                    placeholder="내용을 입력 해 주세요.(최대 200자)" style="overflow:auto"></textarea>
+        </div>
+      </div>
+      <div class="form-group row write-count">
+        <div class="col-sm-12 text-right">
+          <span class="count-num">0</span>
+          <span class="reply-write-total"> / 200</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 text-right">
+          <a class="reply-btn btn btn-primary btn-sm" href="#" data-no="{{no}}">등록</a>
+        </div>
+      </div>
     </div>
   </div>
 </li>
@@ -173,11 +210,15 @@
 </script>
 
 <script id="cmt-reply-template" type="text/x-handlebars-template">
-{{#each list}}
+{{#each childrenList}}
 <li class="list-group-item">
   <div class="comment-reply-box">
-    <p><span> ㄴ </span><strong>{{user}}</strong></p>
-    <p>{{contents}}</p>
+    <div class="row mb-1">
+      <div class="col-sm-10"><strong>{{user}}</strong></div>
+      <div class="col-sm-2 text-right">
+<button type="button" class="cmt-delete-btn btn btn-primary btn-sm" data-no="{{no}}">삭제</button></div>
+    </div>
+    <p class="cmt-contents">{{contents}}</p>
     <p><span>{{createdDate}}</span></p>
   </div>
 </li>
